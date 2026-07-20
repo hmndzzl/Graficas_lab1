@@ -1,7 +1,6 @@
 # Graficas_lab1
-### Hugo Méndez - 241265
 
-----
+## Hugo Méndez - 241265
 
 Este proyecto implementa un framebuffer simple en Rust para dibujar líneas y rellenar polígonos mediante scanline fill.
 
