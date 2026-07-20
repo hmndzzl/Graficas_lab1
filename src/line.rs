@@ -1,32 +1,40 @@
 use crate::framebuffer::Framebuffer;
 
-pub fn draw_line(x0: i32, y0: i32, x1: i32, y1: i32, framebuffer: &mut Framebuffer) {
-    let mut x0 = x0;
-    let mut y0 = y0;
-    let x1 = x1;
-    let y1 = y1;
+pub trait Line {
+    fn line(&mut self, x1: usize, y1: usize, x2: usize, y2: usize);
+}
 
-    let dx = (x1 - x0).abs();
-    let dy = (y1 - y0).abs();
-    let sx = if x0 < x1 { 1 } else { -1 };
-    let sy = if y0 < y1 { 1 } else { -1 };
-    let mut err = dx - dy;
+impl Line for Framebuffer {
+    fn line(&mut self, x1: usize, y1: usize, x2: usize, y2: usize) {
+        let dx = (x2 as i32 - x1 as i32).abs();
+        let dy = -(y2 as i32 - y1 as i32).abs();
 
-    loop {
-        framebuffer.point(x0 as usize, y0 as usize);
+        let sx = if x1 < x2 { 1 } else { -1 };
+        let sy = if y1 < y2 { 1 } else { -1 };
+        
+        let mut err = dx + dy;
 
-        if x0 == x1 && y0 == y1 {
-            break;
-        }
+        let mut x = x1 as i32;
+        let mut y = y1 as i32;
 
-        let e2 = err * 2;
-        if e2 > -dy {
-            err -= dy;
-            x0 += sx;
-        }
-        if e2 < dx {
-            err += dx;
-            y0 += sy;
+        loop {
+            self.point(x as usize, y as usize);
+
+            if x == x2 as i32 && y == y2 as i32 {
+                break;
+            }
+
+            let e2 = 2 * err;
+            
+            if e2 >= dy {
+                err += dy;
+                x += sx;
+            }
+            
+            if e2 <= dx {
+                err += dx;
+                y += sy;
+            }
         }
     }
 }
